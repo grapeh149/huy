@@ -1,0 +1,137 @@
+1. tips: countplot số bàn theo day và time (hue) .
+2. tips: violinplot tip theo day, split=True theo sex (nếu phiên bản hỗ trợ; không thì dùng
+hue) .
+3. tips: pointplot trung b ình tip theo size (số người) .
+4. iris: pairplot với hue="species", corner=True.
+5. iris: heatmap cor relation + thử clustermap so sánh thứ tự hàng/cột.
+6. penguins: bỏ dòng thiếu; scatterplot bill_length_mm vs bill_depth_mm, hue="species".
+7. penguins: FacetGrid + histplot của body_mass_g theo island.
+8. penguins: jointplot bill_length_mm vs flipper_length_mm, kind="kde".GVHD: Th.S Võ Việt Khoa - Khoa CNTT - Trường ĐH Mở TP.HCM.
+31 / 31
+9. titanic: barplot tỷ lệ sống (survived) theo class và sex (hue) .
+10. Tự chọn một dataset seaborn built-in: một f igure Figure-level (relplot hoặc displot) có ít nhất
+col hoặc row — lưu P NG dpi=300
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+
+# load datasets
+tips = sns.load_dataset("tips")
+iris = sns.load_dataset("iris")
+penguins = sns.load_dataset("penguins")
+titanic = sns.load_dataset("titanic")
+
+
+# =========================
+# 1. countplot tips day/time
+# =========================
+plt.figure()
+sns.countplot(data=tips, x="day", hue="time")
+plt.title("Count of Bills by Day and Time")
+plt.show()
+
+
+# =========================
+# 2. violinplot tip by day + sex
+# =========================
+plt.figure()
+sns.violinplot(data=tips, x="day", y="tip", hue="sex", split=True)
+plt.title("Tip Distribution by Day and Sex")
+plt.show()
+
+
+# =========================
+# 3. pointplot mean tip by size
+# =========================
+plt.figure()
+sns.pointplot(data=tips, x="size", y="tip", estimator=np.mean)
+plt.title("Average Tip by Group Size")
+plt.show()
+
+
+# =========================
+# 4. iris pairplot
+# =========================
+sns.pairplot(iris, hue="species", corner=True)
+plt.suptitle("Iris Pairplot", y=1.02)
+plt.show()
+
+
+# =========================
+# 5. iris heatmap + clustermap
+# =========================
+corr = iris.drop(columns=["species"]).corr()
+
+plt.figure()
+sns.heatmap(corr, annot=True, cmap="coolwarm")
+plt.title("Iris Correlation Heatmap")
+plt.show()
+
+sns.clustermap(corr, annot=True, cmap="coolwarm")
+
+
+# =========================
+# 6. penguins scatter
+# =========================
+plt.figure()
+sns.scatterplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species"
+)
+plt.title("Bill Length vs Depth")
+plt.show()
+
+
+# =========================
+# 7. FacetGrid histplot
+# =========================
+g = sns.FacetGrid(penguins, col="island")
+g.map_dataframe(sns.histplot, x="body_mass_g")
+g.fig.suptitle("Body Mass by Island", y=1.05)
+plt.show()
+
+
+# =========================
+# 8. jointplot
+# =========================
+sns.jointplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="flipper_length_mm",
+    kind="kde"
+)
+plt.suptitle("Joint KDE Plot", y=1.02)
+plt.show()
+
+
+# =========================
+# 9. titanic barplot
+# =========================
+plt.figure()
+sns.barplot(data=titanic, x="class", y="survived", hue="sex")
+plt.title("Survival Rate by Class and Sex")
+plt.show()
+
+
+# =========================
+# 10. custom figure-level plot (relplot)
+# =========================
+sns.relplot(
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    col="island"
+)
+
+plt.suptitle("Penguins Relplot by Island", y=1.05)
+
+plt.savefig("penguins_relplot.png", dpi=300)
+plt.show()

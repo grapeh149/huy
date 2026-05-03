@@ -1,0 +1,190 @@
+1. Vẽ hai đường trên cùng axes: (y_1 = \sqr t{x}) , (y_2 = \ln(x+1)) với (x \in [0.1, 5]) ; dùng trục (y) log nếu
+cần để dễ so sánh (ghi chú trong caption/tit le) .
+2. Histogram hai tập dữ liệu chồng (alpha) , cùng bins; thêm legend.
+3. Pie char t 4 loại (≤7 s lice) , có autopct; thử explode một s lice — nhận xét khi nào pie không nên
+dùng (liên hệ Phần III) .
+4. Horizontal bar 8 nhãn (tên dài g iả) ; sắp xếp g iảm dần theo g iá trị.
+5. Er ror bar: 10 đ iểm (x) , (y) g iả, yerr ngẫu nhiên dương; capsize rõ.
+6. Twin axes: cột mưa (mm) + đường nhiệt (° C) theo tháng 1–12 (dữ liệu g iả) ; nhãn hai trục (y) khác
+màu.
+7. Annotation: vẽ parabo l, đánh dấu đ ỉnh bằng annotate + mũi tên.GVHD: Th.S Võ Việt Khoa - Khoa CNTT - Trường ĐH Mở TP.HCM.
+30 / 30
+8. Sty le: vẽ cùng một line p lot dưới 3 plt.style khác nhau (3 figure hoặc 3 subplot); chọn style bạn
+thấy hợp báo cáo nhất.
+9. Pandas: DataFrame có cột time, a, b — line plot hai cột a,b theo time bằng .plot hoặc matplotlib
+thuần.
+10. Báo cáo mini: một figure 2×2 từ dữ liệu Titanic (hoặc CSV tự chọn): bar survival theo class, hist tuổi,
+scatter tuổi–fare, pie giới (hoặc thay pie bằng bar count nếu bạn phản đối pie) — lưu P DF và P N G
+300 dpi.
+
+
+=============================================================================
+=============================================================================
+=============================================================================
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+np.random.seed(42)
+
+# =========================
+# 1. sqrt vs ln
+# =========================
+x = np.linspace(0.1, 5, 200)
+plt.figure()
+plt.plot(x, np.sqrt(x), label='sqrt(x)')
+plt.plot(x, np.log(x + 1), label='ln(x+1)')
+plt.yscale('log')
+plt.title('sqrt(x) vs ln(x+1)')
+plt.legend()
+plt.show()
+
+
+# =========================
+# 2. Histogram
+# =========================
+d1 = np.random.normal(50, 10, 1000)
+d2 = np.random.normal(60, 15, 1000)
+
+plt.figure()
+plt.hist(d1, bins=30, alpha=0.5, label='Dist 1')
+plt.hist(d2, bins=30, alpha=0.5, label='Dist 2')
+plt.legend()
+plt.title("Overlapping Histograms")
+plt.show()
+
+
+# =========================
+# 3. Pie chart
+# =========================
+sizes = [25, 35, 20, 20]
+labels = ['A','B','C','D']
+
+plt.figure()
+plt.pie(sizes, labels=labels, autopct='%1.1f%%', explode=[0,0.1,0,0])
+plt.title("Pie Chart")
+plt.show()
+
+
+# =========================
+# 4. Horizontal bar (FIXED DESC)
+# =========================
+df_bar = pd.DataFrame({
+    "item": ["Very Long Name A","B","C","D","E","F","G","H"],
+    "value": [50,80,30,90,60,20,70,40]
+})
+
+df_bar = df_bar.sort_values("value", ascending=False)
+
+plt.figure()
+plt.barh(df_bar["item"], df_bar["value"])
+plt.title("Sorted Desc Bar Chart")
+plt.gca().invert_yaxis()
+plt.show()
+
+
+# =========================
+# 5. Error bars
+# =========================
+x = np.arange(10)
+y = np.random.rand(10) * 10
+yerr = np.abs(np.random.randn(10))
+
+plt.figure()
+plt.errorbar(x, y, yerr=yerr, fmt='o', capsize=5)
+plt.title("Error Bars")
+plt.show()
+
+
+# =========================
+# 6. Twin axes (FIXED LEGEND)
+# =========================
+m = np.arange(1, 13)
+rain = np.random.randint(50, 200, 12)
+temp = np.random.randint(20, 35, 12)
+
+fig, ax1 = plt.subplots()
+
+l1 = ax1.plot(m, rain, 'b-o', label="Rainfall")
+ax1.set_ylabel("Rain (mm)", color='blue')
+
+ax2 = ax1.twinx()
+l2 = ax2.plot(m, temp, 'r-o', label="Temp")
+ax2.set_ylabel("Temp (°C)", color='red')
+
+lns = l1 + l2
+labs = [l.get_label() for l in lns]
+ax1.legend(lns, labs)
+
+plt.title("Rain vs Temp")
+plt.show()
+
+
+# =========================
+# 7. Parabola annotation
+# =========================
+x = np.linspace(-10,10,200)
+y = x**2
+
+plt.figure()
+plt.plot(x,y)
+plt.scatter(0,0,color='red')
+plt.annotate("Vertex", xy=(0,0), xytext=(2,20),
+             arrowprops=dict(arrowstyle="->"))
+plt.title("Parabola")
+plt.show()
+
+
+# =========================
+# 8. Style comparison (FIXED)
+# =========================
+styles = ['default','ggplot','classic']
+
+for s in styles:
+    with plt.style.context(s):
+        plt.figure()
+        plt.plot([1,2,3,4],[1,4,9,16])
+        plt.title(s)
+        plt.show()
+
+
+# =========================
+# 9. Pandas line plot
+# =========================
+df = pd.DataFrame({
+    "time": range(10),
+    "a": np.random.rand(10),
+    "b": np.random.rand(10)
+})
+
+df.plot(x="time", y=["a","b"])
+plt.title("Line Plot")
+plt.show()
+
+
+# =========================
+# 10. Titanic report
+# =========================
+titanic = sns.load_dataset("titanic")
+
+fig, axs = plt.subplots(2,2, figsize=(10,8))
+
+sns.countplot(data=titanic, x="class", hue="survived", ax=axs[0,0])
+axs[0,0].set_title("Survival by Class")
+
+axs[0,1].hist(titanic["age"].dropna(), bins=30)
+axs[0,1].set_title("Age")
+
+axs[1,0].scatter(titanic["age"], titanic["fare"], alpha=0.5)
+axs[1,0].set_title("Age vs Fare")
+
+sns.countplot(data=titanic, x="sex", ax=axs[1,1])
+axs[1,1].set_title("Sex")
+
+plt.tight_layout()
+plt.savefig("titanic.png", dpi=300)
+plt.savefig("titanic.pdf")
+plt.show()
